@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e243a84c-953b-4ae9-aaea-2582015c7340" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/navigation/AppNavigator.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screens/AddEditStudent.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screens/GradeDistribution.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screens/StudentDetails.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/screens/StudentList.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/firebaseConfig.js" beforeDir="false" afterPath="$PROJECT_DIR$/firebaseConfig.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/metro.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/metro.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
@@ -24,6 +26,9 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="2d2L2pXVQCoGaKDaub6geRLhAtM" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -33,7 +38,7 @@
     "Node.js.metro.config.js.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "ScreenPlaceholders",
     "last_opened_file_path": "/Users/yeet4000/CRUDStudentManagement",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -41,6 +46,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "ts.external.directory.path": "/Users/yeet4000/Library/Application Support/JetBrains/Toolbox/apps/WebStorm/ch-0/233.13135.92/WebStorm.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -53,7 +59,7 @@
       <option name="presentableId" value="Default" />
       <updated>1709201021356</updated>
       <workItem from="1709201022494" duration="2066000" />
-      <workItem from="1709205804219" duration="1323000" />
+      <workItem from="1709205804219" duration="3810000" />
     </task>
     <servers />
   </component>
