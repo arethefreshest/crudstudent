@@ -22,7 +22,6 @@ const StudentList = ({ navigation }) => {
                 setStudents(studentsList);
             } catch (error) {
                 console.error("Error fetching students:", error);
-                // Consider displaying an error message to the user
             }
         };
 
