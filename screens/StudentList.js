@@ -10,15 +10,22 @@ const StudentList = ({ navigation }) => {
 
     useEffect(() => {
         const fetchStudents = async () => {
-            const studentsCollectionRef = collection(db, 'students');
-            const querySnapshot = await getDocs(studentsCollectionRef);
-            const studentsList = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-                DOB: doc.data().DOB.toDate().toISOString().split('T')[0], // Format DOB for editing
-            }));
-            setStudents(studentsList);
+            try {
+                console.log('Fetching students...'); // Log start of fetch
+                const studentsCollectionRef = collection(db, 'students');
+                const querySnapshot = await getDocs(studentsCollectionRef);
+                const studentsList = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                console.log('Fetched students:', studentsList); // Log the result
+                setStudents(studentsList);
+            } catch (error) {
+                console.error("Error fetching students:", error);
+                // Consider displaying an error message to the user
+            }
         };
+
         fetchStudents();
     }, []);
 
@@ -33,6 +40,7 @@ const StudentList = ({ navigation }) => {
         await updateDoc(studentDocRef, editRowData);
         setEditRowId(null); // Exit edit mode
         setEditRowData({}); // Clear edit data
+        StudentList();
     };
 
     const renderHeader = () => (
