@@ -54,6 +54,7 @@ const StudentList = ({ navigation }) => {
     );
 
     const renderItem = ({ item }) => (
+        <ScrollView horizontal>
         <View style={styles.studentRow}>
             {editableFields.map((field, index) => (
                 editRowId === item.id ? (
@@ -85,6 +86,7 @@ const StudentList = ({ navigation }) => {
                 </TouchableOpacity>
             )}
         </View>
+        </ScrollView>
     );
 
     return (
@@ -100,6 +102,7 @@ const StudentList = ({ navigation }) => {
     );
 };
 
+
 const styles = StyleSheet.create({
     studentRow: {
         flexDirection: 'row',
@@ -107,6 +110,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#cccccc',
+        maxWidth: '100vw',
     },
     cell: {
         marginHorizontal: 5,
@@ -127,6 +131,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         padding: 10,
         backgroundColor: '#f3f3f3',
+        maxWidth: '100vw',
     },
     headerCell: {
         marginHorizontal: 5,
