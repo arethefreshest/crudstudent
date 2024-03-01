@@ -1,15 +1,357 @@
-import React from "react";
-import { View, Text, Button} from "react-native";
+import React, { useState, useEffect } from 'react';
+import { Modal, View, Text, FlatList, StyleSheet, ScrollView, TouchableOpacity, Button, TextInput } from 'react-native';
+import { db } from '../firebaseConfig';
+import { collection, getDocs, doc, deleteDoc, updateDoc, addDoc } from 'firebase/firestore';
 
-const Dashboard = ({ navigation }) => {
+
+
+const StudentList = () => {
+    const [students, setStudents] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [date, setDate] = useState(new Date());
+    const [show, setShow] = useState(false);
+    const [selectedId, setSelectedId] = useState(null);
+    const [currentStudent, setCurrentStudent] = useState({
+        id: '',
+        classID: '',
+        fName: '',
+        lName: '',
+        DOB: '',
+        className: '',
+        Score: '',
+        Grade: ''
+    });
+
+
+
+
+    const fetchStudents = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "students"));
+            const studentList = querySnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {id: doc.id, ...data, DOB: convertFirestoreTimestampToDate(data.DOB).toLocaleDateString("en-US")
+                };
+            });
+            studentList.forEach(student => console.log(student.id));
+            setStudents(studentList);}
+        catch (error) {console.error("Error fetching students: ", error);}
+    };
+
+
+
+
+    useEffect(() => {
+        fetchStudents();
+    }, []);
+
+    const handleModalToggle = (student = {
+        id: '',
+        classID: '',
+        fName: '',
+        lName: '',
+        DOB: '',
+        className: '',
+        Score: '',
+        Grade: ''
+    }) => {
+        const studentDOB = student.DOB ? new Date(student.DOB) : new Date();
+        setDate(studentDOB);
+        setCurrentStudent(student);
+        setIsModalVisible(!isModalVisible);
+    };
+
+
+
+
+    const convertFirestoreTimestampToDate = (timestamp) => {
+        return timestamp?.toDate ? timestamp.toDate() : new Date();
+    };
+
+
+
+
+
+    const handleSaveStudent = async () => {
+        try {
+            const { id, ...studentData } = currentStudent;
+
+            if (id) {await updateDoc(doc(db, "students", id), studentData);}
+            else {const docRef = await addDoc(collection(db, "students"), studentData);
+                  await updateDoc(doc(db, "students", docRef.id), { id: docRef.id });
+                  setCurrentStudent(prev => ({ ...prev, id: docRef.id }));
+            }
+            fetchStudents();
+            setIsModalVisible(false);}
+        catch (error) {console.error("Error saving student: ", error);}
+    };
+
+
+
+
+
+    const handleInputChange = (name, value) => {
+        console.log(`Input Changed - Name: ${name}, Value: ${value}`);
+        setCurrentStudent((prev) => ({...prev, [name]: value,}));
+    };
+
+
+
+
+
+
+    const handleDelete = async (id) => {
+        console.log("Deleting student with ID:", id);
+        if (!id) {console.error("Invalid ID for deletion:", id);return;}
+        try {await deleteDoc(doc(db, "students", id));fetchStudents();}
+        catch (error) {console.error("Error deleting student:", error);}
+    };
+
+
+
+
+
+
+    const renderItem = ({ item }) => (
+        <View style={[styles.rowContainer, item.id === selectedId && styles.selectedRow]}>
+            <TouchableOpacity onPress={() => {console.log("Row pressed", item.id);
+                setSelectedId(item.id === selectedId ? null : item.id);}} style={styles.row}>
+                <Text style={styles.cell}>{item.classID}</Text>
+                <Text style={styles.cell}>{item.fName}</Text>
+                <Text style={styles.cell}>{item.lName}</Text>
+                <Text style={styles.cell}>{item.DOB}</Text>
+                <Text style={styles.cell}>{item.className}</Text>
+                <Text style={styles.cell}>{item.Score}</Text>
+                <Text style={styles.cell}>{item.Grade}</Text>
+            </TouchableOpacity>
+            {item.id === selectedId && (
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={styles.buttonEditDelete}
+                        onPress={() => handleModalToggle(item)}
+                    >
+                        <Text style={styles.buttonText}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.buttonEditDelete, { backgroundColor: 'red' }]} // override the backgroundColor for delete button
+                        onPress={() => handleDelete(item.id)}
+                    >
+                        <Text style={styles.buttonText}>Delete</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+        </View>
+    );
+
+
+
+
+
+
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Student list</Text>
+        <View style={{ flex: 1 }}>
+            <View style={styles.table}>
+                <Text style={styles.header}>Student List</Text>
+                <Text style={styles.info}>"Select row to edit or delete"</Text>
+                <View style={styles.row}>
+                    <Text style={styles.cellHeader}>Class ID</Text>
+                    <Text style={styles.cellHeader}>First Name</Text>
+                    <Text style={styles.cellHeader}>Last Name</Text>
+                    <Text style={styles.cellHeader}>DOB</Text>
+                    <Text style={styles.cellHeader}>Class Name</Text>
+                    <Text style={styles.cellHeader}>Score</Text>
+                    <Text style={styles.cellHeader}>Grade</Text>
+                </View>
+                <FlatList data={students} renderItem={renderItem} keyExtractor={item => item.id ? item.id.toString() : `unique-${Math.random()}`} extraData={selectedId}/>
+                <TouchableOpacity style={styles.addStudent} onPress={() => handleModalToggle()}>
+                    <Text style={styles.addStudentText}>Add New Student</Text>
+                </TouchableOpacity>
+            </View>
+            <Modal animationType="slide" transparent={true} visible={isModalVisible} onRequestClose={() => {setIsModalVisible(!isModalVisible);}}>
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        {/* Inputs for editing or adding a student */}
+                        <TextInput
+                            style={styles.Input}
+                            placeholder="Class ID"
+                            placeholderTextColor="#888"
+                            value={currentStudent.classID}
+                            onChangeText={(text) => handleInputChange('classID', text)}
+                        />
+                        <TextInput
+                            style={styles.Input}
+                            placeholder="First Name"
+                            placeholderTextColor="#888"
+                            value={currentStudent.fName}
+                            onChangeText={(text) => handleInputChange('fName', text)}
+                        />
+                        <TextInput
+                            style={styles.Input}
+                            placeholder="Last Name"
+                            placeholderTextColor="#888"
+                            value={currentStudent.lName}
+                            onChangeText={(text) => handleInputChange('lName', text)}
+                        />
+                        <TextInput
+                            style={styles.Input}
+                            placeholder="DOB (mm/dd/yyyy)"
+                            placeholderTextColor="#888"
+                            value={currentStudent.DOB}
+                            onChangeText={(text) => handleInputChange('DOB', text)} />
+                        <TextInput
+                            style={styles.Input}
+                            placeholder="Class Name"
+                            placeholderTextColor="#888"
+                            value={currentStudent.className}
+                            onChangeText={(text) => handleInputChange('className', text)}
+                        />
+                        <TextInput
+                            style={styles.Input}
+                            placeholder="Score"
+                            placeholderTextColor="#888"
+                            value={String(currentStudent.Score)}
+                            onChangeText={(text) => handleInputChange('Score', text)}
+                            keyboardType="numeric"
+                        />
+                        <TextInput
+                            style={styles.Input}
+                            placeholder="Grade"
+                            placeholderTextColor="#888"
+                            value={currentStudent.Grade}
+                            onChangeText={(text) => handleInputChange('Grade', text)}
+                        />
 
-            <Button title="View Students" onPress={() => navigation.navigate('StudentList')} />
-            <Button title="Add Student" onPress={() => navigation.navigate('AddStudent')} />
+                        <TouchableOpacity onPress={handleSaveStudent} style={styles.button}>
+                            <Text style={styles.buttonText}>Save</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => setIsModalVisible(false)} style={[styles.button, {backgroundColor: 'orange'}]}>
+                            <Text style={styles.buttonText}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
 
-export default Dashboard;
+
+
+
+
+
+const styles = StyleSheet.create({
+    rowContainer: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+        padding: 10,
+    },
+    selectedRow: {
+        backgroundColor: 'lightgrey',
+    },
+    header: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        padding: 10,
+        textAlign: 'center',
+    },
+    info: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        padding: 10,
+        textAlign: 'center',
+    },
+    table: {
+        flex: 1,
+        margin: 20,
+    },
+    row: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderBottomColor: '#171616',
+        padding: 10,
+    },
+    cell: {
+        flex: 1,
+        fontSize: 6,
+        padding: 2,
+    },
+    cellHeader: {
+        flex: 1,
+        fontSize: 10,
+        fontWeight: 'bold',
+        padding: 3,
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 100,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 4,
+            height: 4
+        },
+        shadowOpacity: 0.8,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    Input: {
+        height: 40,
+        width: 200,
+        borderColor: 'gray',
+        textAlign: "center",
+        borderWidth: 1,
+        borderRadius: 5,
+        fontSize: 15,
+        marginTop: 8,
+        marginBottom: 8,
+        color: "#000000",
+    },
+    button: {
+        backgroundColor: "#414040",
+        padding: 10,
+        width: "auto",
+        borderRadius: 5,
+        marginTop: 10,
+    },
+    buttonEditDelete: {
+        backgroundColor: "#343434",
+        padding: 10,
+        marginHorizontal: 5,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: "white",
+        textAlign: "center",
+        fontWeight: "bold",
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        padding: 10,
+    },
+    addStudent: {
+        backgroundColor: 'green',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 10,
+        marginBottom: 30,
+    },
+    addStudentText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+});
+
+export default StudentList;

@@ -4,18 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e243a84c-953b-4ae9-aaea-2582015c7340" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FirebaseFunctions.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screens/AddStudent.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/screens/Dashboard.js" afterDir="false" />
+    <list default="true" id="e243a84c-953b-4ae9-aaea-2582015c7340" name="Changes" comment="pushed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/firebaseConfig.js" beforeDir="false" afterPath="$PROJECT_DIR$/firebaseConfig.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FirebaseFunctions.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/navigation/AppNavigator.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/screens/AddEditStudent.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/screens/StudentList.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/StudentList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/AddStudent.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/Dashboard.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/GradeDistribution.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/StudentDetails.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/StudentList.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,6 +71,14 @@
       <workItem from="1709201022494" duration="2066000" />
       <workItem from="1709205804219" duration="3810000" />
     </task>
+    <task id="LOCAL−00001" summary="pushed">
+      <option name="closed" value="true" />
+      <created>1709235252421</created>
+      <option name="number" value="LOCAL−00001" />
+      <option name="presentableId" value="LOCAL−00001" />
+      <updated>1709235252421</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -86,5 +94,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="pushed" />
+    <option name="LAST_COMMIT_MESSAGE" value="pushed" />
   </component>
 </project>
