@@ -20,9 +20,9 @@ const GradeDistribution = ({ navigation }) => {
             const classMap = {};
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                classMap[data.classId] = data.className;
+                classMap[data.classID] = data.className;
             });
-            setClasses(Object.keys(classMap).map(key => ({ classId: key, className: classMap[key] })));
+            setClasses(Object.keys(classMap).map(key => ({ classID: key, className: classMap[key] })));
         };
 
         fetchClasses();
@@ -38,7 +38,7 @@ const GradeDistribution = ({ navigation }) => {
     const calculateGradeDistribution = async (selectedClassId) => {
         try {
             const studentsCollectionRef = collection(db, 'students');
-            const q = query(studentsCollectionRef, where("classId", "==", selectedClassId));
+            const q = query(studentsCollectionRef, where("classID", "==", selectedClass));
             const querySnapshot = await getDocs(q);
             const grades = querySnapshot.docs.map(doc => doc.data().Grade);
             const gradeDistribution = {};
@@ -74,7 +74,7 @@ const GradeDistribution = ({ navigation }) => {
                 style={styles.pickerStyle}
             >
                 {classes.map((cls) => (
-                    <Picker.Item key={cls.classId} label={cls.className} value={cls.classId} />
+                    <Picker.Item key={cls.classID} label={cls.className} value={cls.classID} />
                 ))}
             </Picker>
             {selectedClass && <BarChart

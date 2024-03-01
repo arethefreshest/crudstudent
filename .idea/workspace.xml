@@ -6,14 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e243a84c-953b-4ae9-aaea-2582015c7340" name="Changes" comment="pushed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/navigation/AppNavigator.js" beforeDir="false" afterPath="$PROJECT_DIR$/navigation/AppNavigator.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/screens/AddEditStudent.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/screens/AddStudent.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/screens/Dashboard.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/Dashboard.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/screens/GradeDistribution.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/GradeDistribution.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/screens/StudentDetails.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

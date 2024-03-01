@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, FlatList, StyleSheet, ScrollView, TouchableOpacity, Button, TextInput } from 'react-native';
 import { db } from '../firebaseConfig';
 import { collection, getDocs, doc, deleteDoc, updateDoc, addDoc } from 'firebase/firestore';
-
+import { Timestamp } from 'firebase/firestore';
 
 
 const StudentList = ({ navigation }) => {
     const [students, setStudents] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    //const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [currentStudent, setCurrentStudent] = useState({
@@ -30,7 +29,10 @@ const StudentList = ({ navigation }) => {
             const querySnapshot = await getDocs(collection(db, "students"));
             const studentList = querySnapshot.docs.map(doc => {
                 const data = doc.data();
-                return {id: doc.id, ...data, DOB: convertFirestoreTimestampToDate(data.DOB).toLocaleDateString("en-US")
+                return {
+                    id: doc.id,
+                    ...data,
+                    DOB: formatDate(data.DOB)
                 };
             });
             studentList.forEach(student => console.log(student.id));
@@ -38,8 +40,12 @@ const StudentList = ({ navigation }) => {
         catch (error) {console.error("Error fetching students: ", error);}
     };
 
-
-
+    const formatDate = (timestamp) => {
+        if (!timestamp) return '';
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const isValidDate = date instanceof Date && !isNaN(date);
+        return isValidDate ? date.toISOString().split('T')[0] : '';
+    };
 
     useEffect(() => {
         fetchStudents();
@@ -55,8 +61,6 @@ const StudentList = ({ navigation }) => {
         Score: '',
         Grade: ''
     }) => {
-        const studentDOB = student.DOB ? new Date(student.DOB) : new Date();
-        setDate(studentDOB);
         setCurrentStudent(student);
         setIsModalVisible(!isModalVisible);
     };
@@ -64,28 +68,28 @@ const StudentList = ({ navigation }) => {
 
 
 
-    const convertFirestoreTimestampToDate = (timestamp) => {
-        return timestamp?.toDate ? timestamp.toDate() : new Date();
-    };
-
-
 
 
 
     const handleSaveStudent = async () => {
         try {
-            const { id, ...studentData } = currentStudent;
+            const { id, DOB, ...studentData } = currentStudent;
+            const dobTimestamp = Timestamp.fromDate(new Date(DOB));
+            const studentPayload = { ...studentData, DOB: dobTimestamp };
 
-            if (id) {await updateDoc(doc(db, "students", id), studentData);}
-            else {const docRef = await addDoc(collection(db, "students"), studentData);
-                  await updateDoc(doc(db, "students", docRef.id), { id: docRef.id });
-                  setCurrentStudent(prev => ({ ...prev, id: docRef.id }));
+            if (id) {
+                await updateDoc(doc(db, "students", id), studentPayload);
+            } else {
+                const docRef = await addDoc(collection(db, "students"), studentPayload);
+                await updateDoc(doc(db, "students", docRef.id), { id: docRef.id });
+                setCurrentStudent(prev => ({ ...prev, id: docRef.id }));
             }
             fetchStudents();
-            setIsModalVisible(false);}
-        catch (error) {console.error("Error saving student: ", error);}
+            setIsModalVisible(false);
+        } catch (error) {
+            console.error("Error saving student: ", error);
+        }
     };
-
 
 
 
@@ -198,10 +202,11 @@ const StudentList = ({ navigation }) => {
                         />
                         <TextInput
                             style={styles.Input}
-                            placeholder="DOB (mm/dd/yyyy)"
+                            placeholder="DOB (YYYY-MM-DD)"
                             placeholderTextColor="#888"
                             value={currentStudent.DOB}
-                            onChangeText={(text) => handleInputChange('DOB', text)} />
+                            onChangeText={(text) => handleInputChange('DOB', text)}
+                        />
                         <TextInput
                             style={styles.Input}
                             placeholder="Class Name"
