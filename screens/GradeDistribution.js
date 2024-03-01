@@ -77,13 +77,18 @@ const GradeDistribution = ({ navigation }) => {
                     <Picker.Item key={cls.classID} label={cls.className} value={cls.classID} />
                 ))}
             </Picker>
-            {selectedClass && <BarChart
-                data={chartData}
-                width={screenWidth}
-                height={220}
-                yAxisLabel={''}
-                chartConfig={chartConfig}
-            />}
+            {selectedClass && <View style={styles.chartWrapper}>
+                <BarChart
+                    data={chartData}
+                    width={400}
+                    height={300}
+                    yAxisLabel={''}
+                    chartConfig={chartConfig}
+                    fromZero={true}
+                    yAxisInterval={1}
+                    style={styles.BarChart} // If you want to apply additional styles to the BarChart itself
+                />
+            </View>}
         </View>
     );
 };
@@ -92,34 +97,42 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+        marginTop: 80,
     },
     title: {
-        fontSize: 20,
+        fontSize: 30,
         fontWeight: 'bold',
         marginBottom: 20,
     },
     pickerStyle: {
         height: 50,
-        width: 150,
-    }
+        width: 250,
+        marginBottom: 250,
+    },
+    BarChart: {
+        borderRadius: 15,
+        borderColor: "#964700",
+        borderWidth: 1,
+    },
 });
 
 const chartConfig = {
     backgroundColor: '#e26a00',
     backgroundGradientFrom: '#fb8c00',
     backgroundGradientTo: '#ffa726',
-    decimalPlaces: 1,
+    decimalPlaces: 0,
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     style: {
-        borderRadius: 16
+        borderRadius: 16,
     },
     propsForDots: {
         r: '6',
         strokeWidth: '2',
         stroke: '#ffa726'
-    }
+    },
+    barPercentage: 1, // Adjust bar width
 };
 
 export default GradeDistribution;

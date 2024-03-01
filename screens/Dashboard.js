@@ -21,13 +21,14 @@ const StudentList = ({ navigation }) => {
         Grade: ''
     });
 
-
-
+    const sortByClassName = (data) => {
+        return [...data].sort((a, b) => a.className.localeCompare(b.className));
+    };
 
     const fetchStudents = async () => {
         try {
             const querySnapshot = await getDocs(collection(db, "students"));
-            const studentList = querySnapshot.docs.map(doc => {
+            let studentList = querySnapshot.docs.map(doc => {
                 const data = doc.data();
                 return {
                     id: doc.id,
@@ -35,10 +36,15 @@ const StudentList = ({ navigation }) => {
                     DOB: formatDate(data.DOB)
                 };
             });
-            studentList.forEach(student => console.log(student.id));
-            setStudents(studentList);}
-        catch (error) {console.error("Error fetching students: ", error);}
+            studentList = sortByClassName(studentList);
+            setStudents(studentList);
+        } catch (error) {
+            console.error("Error fetching students: ", error);
+        }
     };
+
+
+
 
     const formatDate = (timestamp) => {
         if (!timestamp) return '';
