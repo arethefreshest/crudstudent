@@ -5,10 +5,10 @@ import { collection, getDocs, doc, deleteDoc, updateDoc, addDoc } from 'firebase
 
 
 
-const StudentList = () => {
+const StudentList = ({ navigation }) => {
     const [students, setStudents] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [date, setDate] = useState(new Date());
+    //const [date, setDate] = useState(new Date());
     const [show, setShow] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
     const [currentStudent, setCurrentStudent] = useState({
@@ -133,7 +133,7 @@ const StudentList = () => {
                         <Text style={styles.buttonText}>Edit</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.buttonEditDelete, { backgroundColor: 'red' }]} // override the backgroundColor for delete button
+                        style={[styles.buttonEditDelete, { backgroundColor: '#f6943f' }]}
                         onPress={() => handleDelete(item.id)}
                     >
                         <Text style={styles.buttonText}>Delete</Text>
@@ -163,6 +163,10 @@ const StudentList = () => {
                     <Text style={styles.cellHeader}>Grade</Text>
                 </View>
                 <FlatList data={students} renderItem={renderItem} keyExtractor={item => item.id ? item.id.toString() : `unique-${Math.random()}`} extraData={selectedId}/>
+                <TouchableOpacity style={styles.Grade}
+                    onPress={() => navigation.navigate('GradeDistribution')}>
+                    <Text style={styles.GradeText}>Grade Distribution</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.addStudent} onPress={() => handleModalToggle()}>
                     <Text style={styles.addStudentText}>Add New Student</Text>
                 </TouchableOpacity>
@@ -263,24 +267,29 @@ const styles = StyleSheet.create({
     },
     table: {
         flex: 1,
-        margin: 20,
+        margin: 8,
     },
     row: {
         flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderBottomColor: '#171616',
-        padding: 10,
+        borderColor: "#000",
+        borderWidth: 1,
+        padding: 0,
+        width: "100%",
     },
     cell: {
-        flex: 1,
+        flex: 4,
         fontSize: 6,
-        padding: 2,
+        padding: 6,
+        textAlign: "center",
+        borderColor: "#000",
+        width: "auto",
     },
     cellHeader: {
         flex: 1,
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: 'bold',
-        padding: 3,
+        padding: 6,
+        textAlign: "center",
     },
     centeredView: {
         flex: 1,
@@ -316,19 +325,22 @@ const styles = StyleSheet.create({
         color: "#000000",
     },
     button: {
-        backgroundColor: "#414040",
+        backgroundColor: "#595858",
         padding: 10,
         width: "auto",
         borderRadius: 5,
         marginTop: 10,
     },
     buttonEditDelete: {
-        backgroundColor: "#343434",
-        padding: 10,
+        backgroundColor: "#595858",
+        padding: 6,
         marginHorizontal: 5,
         borderRadius: 5,
+        borderColor: "#000",
+        borderWidth: 2,
     },
     buttonText: {
+        fontSize: 10,
         color: "white",
         textAlign: "center",
         fontWeight: "bold",
@@ -339,16 +351,34 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     addStudent: {
-        backgroundColor: 'green',
+        backgroundColor: '#ffb471',
         padding: 10,
         borderRadius: 5,
+        borderColor: "#000",
+        borderWidth: 2,
         alignItems: 'center',
         justifyContent: 'center',
         margin: 10,
         marginBottom: 30,
     },
     addStudentText: {
-        color: 'white',
+        color: 'black',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    Grade: {
+        backgroundColor: '#ffb471',
+        padding: 10,
+        borderRadius: 5,
+        borderColor: "#000",
+        borderWidth: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: 10,
+        marginBottom: 30,
+    },
+    GradeText: {
+        color: 'black',
         fontWeight: 'bold',
         fontSize: 16,
     },
