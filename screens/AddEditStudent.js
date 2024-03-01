@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button } from "react-native";
 import { db } from "../firebaseConfig";
-import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const AddEditStudent = ({ route, navigation }) => {
     const { mode, studentId } = route.params || {}; // Get mode and studentId (if in edit mode)
@@ -11,8 +11,8 @@ const AddEditStudent = ({ route, navigation }) => {
     const [DOB, setDOB] = useState('');
     const [Grade, setGrade] = useState('');
     const [Score, setScore] = useState('');
-    const [classId, setclassId] = useState('');
-    const [className, setclassName] = useState('');
+    const [classId, setClassId] = useState('');
+    const [className, setClassName] = useState('');
 
 
     useEffect(() => {
@@ -22,12 +22,14 @@ const AddEditStudent = ({ route, navigation }) => {
                 const studentDocRef = doc(db, 'students', studentId);
                 const docSnapshot = await getDoc(studentDocRef);
                 if (docSnapshot.exists()) {
-                    setFName(docSnapshot.data().fName);
-                    setLName(docSnapshot.data().lName);
-                    setDOB(docSnapshot.data().DOB);
-                    setGrade(docSnapshot.data().Grade);
-                    setScore(docSnapshot.data().Score);
-                    setclassId(docSnapshot.data().classId);
+                    const data = docSnapshot.data();
+                    setFName(data.fName || '');
+                    setLName(data.lName || '');
+                    setDOB(data.DOB || '');
+                    setGrade(data.Grade || '');
+                    setScore(data.Score ? data.Score.toString() : '');
+                    setClassId(data.classId || '');
+                    setClassName(data.className || '');
 
                 } else {
                     // Handle case where student with the ID isn't found
@@ -42,8 +44,9 @@ const AddEditStudent = ({ route, navigation }) => {
             fName,
             lName,
             DOB,
+            // Convert back to numbers if necessary
             Grade,
-            Score,
+            Score: Score ? Number(Score) : 0,
             classId,
             className,
         };
@@ -75,8 +78,8 @@ const AddEditStudent = ({ route, navigation }) => {
             <TextInput placeholder="DOB" value={DOB} onChangeText={setDOB} />
             <TextInput placeholder="Grade" value={Grade} onChangeText={setGrade} />
             <TextInput placeholder="Score" value={Score} onChangeText={setScore} />
-            <TextInput placeholder="Class ID" value={classId} onChangeText={setclassId} />
-            <TextInput placeholder="Class Name" value={className} onChangeText={setclassName} />
+            <TextInput placeholder="Class ID" value={classId} onChangeText={setClassId} />
+            <TextInput placeholder="Class Name" value={className} onChangeText={setClassName} />
 
             <Button title="Submit" onPress={handleSubmit} />
         </View>

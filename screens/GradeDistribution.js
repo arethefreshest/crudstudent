@@ -1,55 +1,89 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebaseConfig";
-import { collection, getDocs } from 'firebase/firestore';
+import {collection, doc, getDocs, query, where} from 'firebase/firestore';
 import { View, Text, StyleSheet } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { BarChart } from 'react-native-chart-kit'; // You'll likely need to install a charting library
 import { Dimensions } from 'react-native'; // To get the screen width
 
 const GradeDistribution = ({ navigation }) => {
+    const [classes, setClasses] = useState([]);
+    const [selectedClass, setSelectedClass] = useState(null);
     const [gradeCounts, setGradeCounts] = useState({});
+    const screenWidth = Dimensions.get("window").width;
 
     useEffect(() => {
-        const calculateGradeDistribution = async () => {
+        const fetchClasses = async () => {
             const studentsCollectionRef = collection(db, 'students');
             const querySnapshot = await getDocs(studentsCollectionRef);
-            const studentData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            const grades = studentData.map(student => student.Grade);
-            const gradeDistribution = {};
-
-            // Assuming letter grades:
-            ['A', 'B', 'C', 'D', 'F'].forEach(grade => {
-                gradeDistribution[grade] = grades.filter(g => g === grade).length;
+            // Extract the class details from students
+            const classMap = {};
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                classMap[data.classId] = data.className;
             });
-
-            setGradeCounts(gradeDistribution);
+            setClasses(Object.keys(classMap).map(key => ({ classId: key, className: classMap[key] })));
         };
 
-        calculateGradeDistribution();
+        fetchClasses();
     }, []);
+
+    useEffect(() => {
+        // Calculate grade distribution when class is selected
+        if (selectedClass) {
+            calculateGradeDistribution(selectedClass);
+        }
+    }, [selectedClass]);
+
+    const calculateGradeDistribution = async (selectedClassId) => {
+        try {
+            const studentsCollectionRef = collection(db, 'students');
+            const q = query(studentsCollectionRef, where("classId", "==", selectedClassId));
+            const querySnapshot = await getDocs(q);
+            const grades = querySnapshot.docs.map(doc => doc.data().Grade);
+            const gradeDistribution = {};
+            // Assuming letter grades:
+            ['A', 'B', 'C', 'D', 'E', 'F'].forEach(grade => {
+                gradeDistribution[grade] = grades.filter(g => g === grade).length;
+            });
+            setGradeCounts(gradeDistribution);
+        } catch (error) {
+            console.error("Failed to calculate grade distribution: ", error);
+        }
+    };
 
     // Chart Data (for BarChart component)
     const chartData = {
-        labels: Object.keys(gradeCounts),
+        labels: Object.keys(gradeCounts).length > 0 ? Object.keys(gradeCounts) : ['A', 'B', 'C', 'D', 'E', 'F'],
         datasets: [
             {
-                data: Object.values(gradeCounts)
+                data: Object.values(gradeCounts).length > 0 ? Object.values(gradeCounts) : [0, 0, 0, 0, 0, 0],
             }
         ]
     };
 
-    const screenWidth = Dimensions.get("window").width;
-
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Grade Distribution</Text>
-            <BarChart
+            <Picker
+                selectedValue={selectedClass}
+                onValueChange={(itemValue, itemIndex) => {
+                    setSelectedClass(itemValue);
+                    calculateGradeDistribution(itemValue);
+                }}
+                style={styles.pickerStyle}
+            >
+                {classes.map((cls) => (
+                    <Picker.Item key={cls.classId} label={cls.className} value={cls.classId} />
+                ))}
+            </Picker>
+            {selectedClass && <BarChart
                 data={chartData}
                 width={screenWidth}
                 height={220}
-                yAxisLabel={'#'}
+                yAxisLabel={''}
                 chartConfig={chartConfig}
-            />
+            />}
         </View>
     );
 };
@@ -64,11 +98,28 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 20,
+    },
+    pickerStyle: {
+        height: 50,
+        width: 150,
     }
 });
 
 const chartConfig = {
-    // ... Add chart configurations here as needed
+    backgroundColor: '#e26a00',
+    backgroundGradientFrom: '#fb8c00',
+    backgroundGradientTo: '#ffa726',
+    decimalPlaces: 1, // optional, specifies the number of decimal places in the chart
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // function returning a color
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`, // function returning a color for the label
+    style: {
+        borderRadius: 16
+    },
+    propsForDots: {
+        r: '6',
+        strokeWidth: '2',
+        stroke: '#ffa726'
+    }
 };
 
 export default GradeDistribution;
