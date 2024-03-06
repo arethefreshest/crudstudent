@@ -6,36 +6,47 @@ import { Picker } from "@react-native-picker/picker";
 import { BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 
+
 const GradeDistribution = ({ navigation }) => {
     const [classes, setClasses] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [gradeCounts, setGradeCounts] = useState({});
     const screenWidth = Dimensions.get("window").width;
 
+
+
+
     useEffect(() => {
-        const fetchClasses = async () => {
-            const studentsCollectionRef = collection(db, 'students');
-            const querySnapshot = await getDocs(studentsCollectionRef);
+        const fetchC = async () => {
+            const CollectionRef = collection(db, 'students');
+            const Snapshot = await getDocs(CollectionRef);
 
-            const classMap = {};
-            querySnapshot.forEach((doc) => {
+
+
+            const Map = {};
+            Snapshot.forEach((doc) => {
                 const data = doc.data();
-                classMap[data.classID] = data.className;
+                Map[data.classID] = data.className;
             });
-            setClasses(Object.keys(classMap).map(key => ({ classID: key, className: classMap[key] })));
+            setClasses(Object.keys(Map).map(key => ({ classID: key, className: Map[key] })));
         };
-
-        fetchClasses();
+        fetchC();
     }, []);
+
+
+
 
     useEffect(() => {
 
         if (selectedClass) {
-            calculateGradeDistribution(selectedClass);
+            calculate(selectedClass);
         }
     }, [selectedClass]);
 
-    const calculateGradeDistribution = async (selectedClassId) => {
+
+
+
+    const calculate = async (selectedClassId) => {
         try {
             const studentsCollectionRef = collection(db, 'students');
             const q = query(studentsCollectionRef, where("classID", "==", selectedClass));
@@ -53,7 +64,10 @@ const GradeDistribution = ({ navigation }) => {
     };
 
 
-    const chartData = {
+
+
+
+    const Data = {
         labels: Object.keys(gradeCounts).length > 0 ? Object.keys(gradeCounts) : ['A', 'B', 'C', 'D', 'E', 'F'],
         datasets: [
             {
@@ -62,36 +76,35 @@ const GradeDistribution = ({ navigation }) => {
         ]
     };
 
+
+
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Grade Distribution</Text>
             <Picker
                 selectedValue={selectedClass}
-                onValueChange={(itemValue, itemIndex) => {
-                    setSelectedClass(itemValue);
-                    calculateGradeDistribution(itemValue);
-                }}
-                style={styles.pickerStyle}
-            >
-                {classes.map((cls) => (
-                    <Picker.Item key={cls.classID} label={cls.className} value={cls.classID} />
-                ))}
+                onValueChange={(itemValue, itemIndex) => {setSelectedClass(itemValue);calculate(itemValue);}}
+                style={styles.pickerStyle}>
+                {classes.map((cls) => (<Picker.Item key={cls.classID} label={cls.className} value={cls.classID} />))}
             </Picker>
             {selectedClass && <View style={styles.chartWrapper}>
                 <BarChart
-                    data={chartData}
+                    data={Data}
                     width={400}
                     height={300}
                     yAxisLabel={''}
                     chartConfig={chartConfig}
                     fromZero={true}
-                    yAxisInterval={1}
-                    style={styles.BarChart} // If you want to apply additional styles to the BarChart itself
-                />
+                    yAxisInterval={0}
+                    style={styles.BarChart}/>
             </View>}
         </View>
     );
 };
+
+
+
 
 const styles = StyleSheet.create({
     container: {
@@ -132,7 +145,7 @@ const chartConfig = {
         strokeWidth: '2',
         stroke: '#ffa726'
     },
-    barPercentage: 1, // Adjust bar width
+    barPercentage: 1,
 };
 
 export default GradeDistribution;

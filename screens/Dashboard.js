@@ -5,7 +5,7 @@ import { collection, getDocs, doc, deleteDoc, updateDoc, addDoc } from 'firebase
 import { Timestamp } from 'firebase/firestore';
 
 
-const StudentList = ({ navigation }) => {
+const Students = ({ navigation }) => {
     const [students, setStudents] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [show, setShow] = useState(false);
@@ -21,11 +21,17 @@ const StudentList = ({ navigation }) => {
         Grade: ''
     });
 
-    const sortByClassName = (data) => {
+
+
+
+    const sortClassName = (data) => {
         return [...data].sort((a, b) => a.className.localeCompare(b.className));
     };
 
-    const fetchStudents = async () => {
+
+
+
+    const fetchS = async () => {
         try {
             const querySnapshot = await getDocs(collection(db, "students"));
             let studentList = querySnapshot.docs.map(doc => {
@@ -33,10 +39,10 @@ const StudentList = ({ navigation }) => {
                 return {
                     id: doc.id,
                     ...data,
-                    DOB: formatDate(data.DOB)
+                    DOB: forDate(data.DOB)
                 };
             });
-            studentList = sortByClassName(studentList);
+            studentList = sortClassName(studentList);
             setStudents(studentList);
         } catch (error) {
             console.error("Error fetching students: ", error);
@@ -46,18 +52,26 @@ const StudentList = ({ navigation }) => {
 
 
 
-    const formatDate = (timestamp) => {
+    const forDate = (timestamp) => {
         if (!timestamp) return '';
         const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
         const isValidDate = date instanceof Date && !isNaN(date);
         return isValidDate ? date.toISOString().split('T')[0] : '';
     };
 
+
+
+
+
     useEffect(() => {
-        fetchStudents();
+        fetchS();
     }, []);
 
-    const handleModalToggle = (student = {
+
+
+
+
+    const toggleModal = (student = {
         id: '',
         classID: '',
         fName: '',
@@ -75,9 +89,7 @@ const StudentList = ({ navigation }) => {
 
 
 
-
-
-    const handleSaveStudent = async () => {
+    const SaveStudent = async () => {
         try {
             const { id, DOB, ...studentData } = currentStudent;
             const dobTimestamp = Timestamp.fromDate(new Date(DOB));
@@ -90,7 +102,7 @@ const StudentList = ({ navigation }) => {
                 await updateDoc(doc(db, "students", docRef.id), { id: docRef.id });
                 setCurrentStudent(prev => ({ ...prev, id: docRef.id }));
             }
-            fetchStudents();
+            fetchS();
             setIsModalVisible(false);
         } catch (error) {
             console.error("Error saving student: ", error);
@@ -100,7 +112,8 @@ const StudentList = ({ navigation }) => {
 
 
 
-    const handleInputChange = (name, value) => {
+
+    const InputChange = (name, value) => {
         console.log(`Input Changed - Name: ${name}, Value: ${value}`);
         setCurrentStudent((prev) => ({...prev, [name]: value,}));
     };
@@ -110,10 +123,10 @@ const StudentList = ({ navigation }) => {
 
 
 
-    const handleDelete = async (id) => {
+    const Delete = async (id) => {
         console.log("Deleting student with ID:", id);
         if (!id) {console.error("Invalid ID for deletion:", id);return;}
-        try {await deleteDoc(doc(db, "students", id));fetchStudents();}
+        try {await deleteDoc(doc(db, "students", id));fetchS();}
         catch (error) {console.error("Error deleting student:", error);}
     };
 
@@ -122,7 +135,7 @@ const StudentList = ({ navigation }) => {
 
 
 
-    const renderItem = ({ item }) => (
+    const studentList = ({ item }) => (
         <View style={[styles.rowContainer, item.id === selectedId && styles.selectedRow]}>
             <TouchableOpacity onPress={() => {console.log("Row pressed", item.id);
                 setSelectedId(item.id === selectedId ? null : item.id);}} style={styles.row}>
@@ -138,13 +151,13 @@ const StudentList = ({ navigation }) => {
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
                         style={styles.buttonEditDelete}
-                        onPress={() => handleModalToggle(item)}
+                        onPress={() => toggleModal(item)}
                     >
                         <Text style={styles.buttonText}>Edit</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={[styles.buttonEditDelete, { backgroundColor: '#f6943f' }]}
-                        onPress={() => handleDelete(item.id)}
+                        onPress={() => Delete(item.id)}
                     >
                         <Text style={styles.buttonText}>Delete</Text>
                     </TouchableOpacity>
@@ -172,12 +185,12 @@ const StudentList = ({ navigation }) => {
                     <Text style={styles.cellHeader}>Score</Text>
                     <Text style={styles.cellHeader}>Grade</Text>
                 </View>
-                <FlatList data={students} renderItem={renderItem} keyExtractor={item => item.id ? item.id.toString() : `unique-${Math.random()}`} extraData={selectedId}/>
+                <FlatList data={students} renderItem={studentList} keyExtractor={item => item.id ? item.id.toString() : `unique-${Math.random()}`} extraData={selectedId}/>
                 <TouchableOpacity style={styles.Grade}
                     onPress={() => navigation.navigate('GradeDistribution')}>
                     <Text style={styles.GradeText}>Grade Distribution</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.addStudent} onPress={() => handleModalToggle()}>
+                <TouchableOpacity style={styles.addStudent} onPress={() => toggleModal()}>
                     <Text style={styles.addStudentText}>Add New Student</Text>
                 </TouchableOpacity>
             </View>
@@ -190,42 +203,42 @@ const StudentList = ({ navigation }) => {
                             placeholder="Class ID"
                             placeholderTextColor="#888"
                             value={currentStudent.classID}
-                            onChangeText={(text) => handleInputChange('classID', text)}
+                            onChangeText={(text) => InputChange('classID', text)}
                         />
                         <TextInput
                             style={styles.Input}
                             placeholder="First Name"
                             placeholderTextColor="#888"
                             value={currentStudent.fName}
-                            onChangeText={(text) => handleInputChange('fName', text)}
+                            onChangeText={(text) => InputChange('fName', text)}
                         />
                         <TextInput
                             style={styles.Input}
                             placeholder="Last Name"
                             placeholderTextColor="#888"
                             value={currentStudent.lName}
-                            onChangeText={(text) => handleInputChange('lName', text)}
+                            onChangeText={(text) => InputChange('lName', text)}
                         />
                         <TextInput
                             style={styles.Input}
                             placeholder="DOB (YYYY-MM-DD)"
                             placeholderTextColor="#888"
                             value={currentStudent.DOB}
-                            onChangeText={(text) => handleInputChange('DOB', text)}
+                            onChangeText={(text) => InputChange('DOB', text)}
                         />
                         <TextInput
                             style={styles.Input}
                             placeholder="Class Name"
                             placeholderTextColor="#888"
                             value={currentStudent.className}
-                            onChangeText={(text) => handleInputChange('className', text)}
+                            onChangeText={(text) => InputChange('className', text)}
                         />
                         <TextInput
                             style={styles.Input}
                             placeholder="Score"
                             placeholderTextColor="#888"
                             value={String(currentStudent.Score)}
-                            onChangeText={(text) => handleInputChange('Score', text)}
+                            onChangeText={(text) => InputChange('Score', text)}
                             keyboardType="numeric"
                         />
                         <TextInput
@@ -233,10 +246,10 @@ const StudentList = ({ navigation }) => {
                             placeholder="Grade"
                             placeholderTextColor="#888"
                             value={currentStudent.Grade}
-                            onChangeText={(text) => handleInputChange('Grade', text)}
+                            onChangeText={(text) => InputChange('Grade', text)}
                         />
 
-                        <TouchableOpacity onPress={handleSaveStudent} style={styles.button}>
+                        <TouchableOpacity onPress={SaveStudent} style={styles.button}>
                             <Text style={styles.buttonText}>Save</Text>
                         </TouchableOpacity>
 
@@ -249,6 +262,8 @@ const StudentList = ({ navigation }) => {
         </View>
     );
 };
+
+
 
 
 
@@ -395,4 +410,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default StudentList;
+export default Students;
